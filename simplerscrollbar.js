@@ -14,7 +14,6 @@ const SimplerScrollbar = function() {
   height: 100%;
   width: calc(100% + 0.8em);
   padding: 0 0 0 0;
-  padding-right: 1em;
   overflow: auto;
   box-sizing: border-box;
 }
