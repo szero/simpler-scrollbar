@@ -9,7 +9,7 @@ creating extra nodes.
 
 ## Benefits
 
-- Extremely lightweight (less than 1KB after gzip and minify)
+- Extremely lightweight (less than 1.5KB after gzip and minify)
 - It uses the native and [passive](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners)
 scroll events, so:
   - All the events work and are smooth (mouse wheel, space, page down, page up, arrows etc).
