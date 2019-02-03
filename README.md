@@ -55,10 +55,10 @@ If you want to manually turn your div in a SimpleScrollbar, you can use the
 ```
 
 ### Dynamically added content
-If the site you want to plug the scrollbar have 
-DOMElements dynamically in your app, and you want to use the SimpleScrollbar `ss-container`
-attribute, you can use the `SimpleScrollbar.initAll` method, and it will turn all the elements
-with that attribute in a scrollable one for you.
+If the site you want to plug the scrollbar in have DOMElements generated dynamically, and you 
+want to use the SimpleScrollbar `ss-container` attribute, you can use the 
+`SimpleScrollbar.initAll` method, and it will turn all the elements with that attribute in
+a scrollable one for you.
 
 ```Javascript
 var div = document.createElement('div');
