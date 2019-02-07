@@ -277,8 +277,8 @@
         "space-unary-ops": "warn",
         "spaced-comment": "off",
         "strict": "warn",
-        "switch-colon-spacing": "error",
-        "symbol-description": "error",
+        "switch-colon-spacing": "warn",
+        "symbol-description": "warn",
         "template-curly-spacing": [
             "error",
             "never"

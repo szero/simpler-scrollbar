@@ -14,7 +14,9 @@ const SimplerScrollbar = function() {
   height: 100%;
   width: calc(100% + 0.8em);
   padding: 0 0 0 0;
-  overflow: auto;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: scroll;
   box-sizing: border-box;
 }
 
@@ -28,10 +30,6 @@ const SimplerScrollbar = function() {
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.25s linear;
-}
-
-.ss-hidden {
-  display: none;
 }
 
 .ss-container:hover .ss-scroll,
@@ -57,7 +55,6 @@ const SimplerScrollbar = function() {
     head.insertAdjacentHTML("afterbegin", styleSheet);
   }, true);
 
-
   class simplerscrollbar {
     constructor({container, wrapper, content, rightOffset = 0} = {}) {
       if (!container) {
@@ -65,13 +62,12 @@ const SimplerScrollbar = function() {
       }
       this.target = container;
 
-      this.bar = '<div class="ss-scroll">';
-
       this.wrapper = wrapper || document.createElement('div');
       this.wrapper.setAttribute('class', 'ss-wrapper');
 
       this.content = content || document.createElement('div');
       this.content.setAttribute('class', 'ss-content');
+      this.content.style.width = `calc(100% + ${this.scrollWidth}px)`;
 
       if (!wrapper && !content) {
         this.wrapper.appendChild(this.content);
@@ -84,14 +80,14 @@ const SimplerScrollbar = function() {
 
       this.target.insertAdjacentHTML('beforeend', '<div class="ss-scroll">');
       this.bar = this.target.lastChild;
+      this.eventArgs = {passive: true, capture: true};
 
       this.dragDealer();
       this.moveBar(rightOffset);
 
-      window.addEventListener('resize', this.moveBar.bind(this, rightOffset), {passive: true});
-      this.content.addEventListener('scroll', this.moveBar.bind(this, rightOffset), {passive: true});
-      this.content.addEventListener('mouseenter', this.moveBar.bind(this, rightOffset), {passive: true});
-      this.content.addEventListener('mouseout', this.moveBar.bind(this, rightOffset), {passive: true, once: true});
+      window.addEventListener('resize', this.moveBar.bind(this, rightOffset), this.eventArgs);
+      this.content.addEventListener('scroll', this.moveBar.bind(this, rightOffset), this.eventArgs);
+      this.content.addEventListener('mouseenter', this.moveBar.bind(this, rightOffset), this.eventArgs);
 
       this.target.classList.add('ss-container');
 
@@ -100,24 +96,41 @@ const SimplerScrollbar = function() {
         container.style.height = css['max-height'];
       }
     }
+    // Credit: https://github.com/buzinas/simple-scrollbar/pull/37
+    get scrollWidth() {
+      const outer = document.createElement('div');
+      const inner = document.createElement('div');
+      outer.style.width = inner.style.width = '100%';
+      outer.style.overflow = 'scroll';
+      document.body.appendChild(outer).appendChild(inner);
+      const scroll_width = outer.offsetWidth - inner.offsetWidth;
+      outer.parentNode.removeChild(outer);
+      return scroll_width;
+    }
+
     moveBar(rightOffset) {
       const totalHeight = this.content.scrollHeight,
         ownHeight = this.content.clientHeight,
         that = this;
 
-      this.scrollRatio = ownHeight / totalHeight;
-      const right = (that.target.clientWidth - that.bar.clientWidth - rightOffset) * -1;
+      const scrollRatio = ownHeight / totalHeight;
+      if (scrollRatio >= 1) {
+        that.bar.style.opacity = 0;
+        that.bar.style.cursor = "auto";
+        return;
+      }
+      if (scrollRatio >= 0.1) {
+        this.scrollRatio = scrollRatio;
+      }
+      else {
+        this.scrollRatio = scrollRatio * (0.9 + scrollRatio);
+      }
+
       raf(() => {
-        // Hide scrollbar if no scrolling is possible
-        if (that.scrollRatio >= 1) {
-          that.bar.classList.add('ss-hidden');
-        }
-        else {
-          that.bar.classList.remove('ss-hidden');
-          that.bar.style.cssText = `height: ${Math.max(that.scrollRatio * 100, 0)}%;
-            top: ${(that.content.scrollTop / totalHeight) * 100}%;
-            right: ${right}px;`;
-        }
+        const ratio = that.scrollRatio * 100;
+        that.bar.style.cssText = `height: ${Math.max(ratio, 10)}%;
+        top: ${(that.content.scrollTop / totalHeight) * (ratio >= 10 ? 100 : 90 + ratio)}%;
+        right: ${(that.target.clientWidth - that.bar.clientWidth + rightOffset) * -1}px;`;
       });
     }
     // Mouse drag handler
@@ -129,11 +142,11 @@ const SimplerScrollbar = function() {
         lastPageY = e.pageY;
         document.body.classList.add('ss-grabbed');
 
-        document.addEventListener('mousemove', drag, {passive: true});
-        document.addEventListener('mouseup', stop, {passive: true});
+        document.addEventListener('mousemove', drag, that.eventArgs);
+        document.addEventListener('mouseup', stop, that.eventArgs);
 
         return false;
-      }, {passive: true});
+      }, that.eventArgs);
 
       function drag(e) {
         const delta = e.pageY - lastPageY;
@@ -146,8 +159,8 @@ const SimplerScrollbar = function() {
       function stop() {
         that.bar.classList.remove('ss-grabbed');
         document.body.classList.remove('ss-grabbed');
-        document.removeEventListener('mousemove', drag, {passive: true});
-        document.removeEventListener('mouseup', stop, {passive: true});
+        document.removeEventListener('mousemove', drag, that.eventArgs);
+        document.removeEventListener('mouseup', stop, that.eventArgs);
       }
     }
   }
