@@ -1,4 +1,12 @@
-const SimplerScrollbar = function() {
+;(function(root, factory) {
+  "use strict";
+  if (typeof exports === "object") {
+    module.exports = factory(window, document);
+  }
+  else {
+    root.SimplerScrollbar = factory(window, document);
+  }
+})(this, function(w, d) {
   'use strict';
   const styleSheet = `<style type="text/css">
 .ss-wrapper {
@@ -45,13 +53,13 @@ const SimplerScrollbar = function() {
   user-select: none;
 }
 </style>`;
-  const raf = window.requestAnimationFrame || window.setImmediate || function(c) {
+  const raf = w.requestAnimationFrame || w.setImmediate || function(c) {
     return setTimeout(c);
   };
 
   addEventListener("DOMContentLoaded", function dom() {
     removeEventListener("DOMContentLoaded", dom, true);
-    const head = document.getElementsByTagName("head")[0];
+    const head = d.getElementsByTagName("head")[0];
     head.insertAdjacentHTML("afterbegin", styleSheet);
   }, true);
 
@@ -62,10 +70,10 @@ const SimplerScrollbar = function() {
       }
       this.target = container;
 
-      this.wrapper = wrapper || document.createElement('div');
+      this.wrapper = wrapper || d.createElement('div');
       this.wrapper.setAttribute('class', 'ss-wrapper');
 
-      this.content = content || document.createElement('div');
+      this.content = content || d.createElement('div');
       this.content.setAttribute('class', 'ss-content');
       this.content.style.width = `calc(100% + ${this.scrollWidth}px)`;
 
@@ -85,24 +93,24 @@ const SimplerScrollbar = function() {
       this.dragDealer();
       this.moveBar(rightOffset);
 
-      window.addEventListener('resize', this.moveBar.bind(this, rightOffset), this.eventArgs);
+      w.addEventListener('resize', this.moveBar.bind(this, rightOffset), this.eventArgs);
       this.content.addEventListener('scroll', this.moveBar.bind(this, rightOffset), this.eventArgs);
       this.content.addEventListener('mouseenter', this.moveBar.bind(this, rightOffset), this.eventArgs);
 
       this.target.classList.add('ss-container');
 
-      const css = window.getComputedStyle(container);
+      const css = w.getComputedStyle(container);
       if (css.height === '0px' && css['max-height'] !== '0px') {
         container.style.height = css['max-height'];
       }
     }
     // Credit: https://github.com/buzinas/simple-scrollbar/pull/37
     get scrollWidth() {
-      const outer = document.createElement('div');
-      const inner = document.createElement('div');
+      const outer = d.createElement('div');
+      const inner = d.createElement('div');
       outer.style.width = inner.style.width = '100%';
       outer.style.overflow = 'scroll';
-      document.body.appendChild(outer).appendChild(inner);
+      d.body.appendChild(outer).appendChild(inner);
       const scroll_width = outer.offsetWidth - inner.offsetWidth;
       outer.parentNode.removeChild(outer);
       return scroll_width;
@@ -140,10 +148,10 @@ const SimplerScrollbar = function() {
       that.bar.addEventListener('mousedown', e => {
         that.bar.classList.add('ss-grabbed');
         lastPageY = e.pageY;
-        document.body.classList.add('ss-grabbed');
+        d.body.classList.add('ss-grabbed');
 
-        document.addEventListener('mousemove', drag, that.eventArgs);
-        document.addEventListener('mouseup', stop, that.eventArgs);
+        d.addEventListener('mousemove', drag, that.eventArgs);
+        d.addEventListener('mouseup', stop, that.eventArgs);
 
         return false;
       }, that.eventArgs);
@@ -158,9 +166,9 @@ const SimplerScrollbar = function() {
 
       function stop() {
         that.bar.classList.remove('ss-grabbed');
-        document.body.classList.remove('ss-grabbed');
-        document.removeEventListener('mousemove', drag, that.eventArgs);
-        document.removeEventListener('mouseup', stop, that.eventArgs);
+        d.body.classList.remove('ss-grabbed');
+        d.removeEventListener('mousemove', drag, that.eventArgs);
+        d.removeEventListener('mouseup', stop, that.eventArgs);
       }
     }
   }
@@ -171,14 +179,14 @@ const SimplerScrollbar = function() {
       value: new simplerscrollbar(argObj)
     });
   };
-
-  return {
+  const SimplerScrollbar = {
     initContainer,
     initAll() {
-      const all_divs = document.querySelectorAll("*[ss-container]");
+      const all_divs = d.querySelectorAll("*[ss-container]");
       all_divs.forEach(container => {
         initContainer({container});
       });
     }
   };
-}.call(this);
+  return SimplerScrollbar;
+});

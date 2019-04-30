@@ -2,7 +2,7 @@
 Indirect fork of [SimpleScrollbar](https://github.com/buzinas/simple-scrollbar).
 
 I rewrote it using ES6 features with intention to be used as an require drop-in 
-in greasemonkey  scripts. As a result, there is no import/require functionality.
+in greasemonkey  scripts. It still can be used as a module. 
 I changed the constructor to accept the wrapper and content divs directly as an option 
 so it can be used as a plug-in scrollbar in existing sites without a need of 
 creating extra nodes.
@@ -12,8 +12,8 @@ creating extra nodes.
 - Extremely lightweight (less than 1.5KB after gzip and minify)
 - It uses the native and [passive](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners)
 scroll events, so:
-  - All the events work and are smooth (mouse wheel, space, page down, page up, arrows etc).
-  - The performance is awesome!
+- All the events work and are smooth (mouse wheel, space, page down, page up, arrows etc).
+- The performance is awesome!
 - No dependencies, completely vanilla Javascript!
 
 ## Browser Support
