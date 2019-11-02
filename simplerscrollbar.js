@@ -133,7 +133,6 @@
       else {
         this.scrollRatio = scrollRatio * (0.9 + scrollRatio);
       }
-
       raf(() => {
         const ratio = that.scrollRatio * 100;
         that.bar.style.cssText = `height: ${Math.max(ratio, 10)}%;
@@ -155,9 +154,11 @@
     dragDealer() {
       let lastPageY;
       let mousePosOnBar;
+      let offset;
       const that = this;
       that.bar.addEventListener('mousedown', e => {
         that.bar.classList.add('ss-grabbed');
+        offset = that.getOffsetFromEvent(e);
         lastPageY = e.pageY;
         mousePosOnBar = e.clientY - e.target.offsetTop;
         d.body.classList.add('ss-grabbed');
@@ -169,7 +170,6 @@
       }, that.eventArgs);
 
       function drag(e) {
-        const offset = that.getOffsetFromEvent(e);
         if (offset === null) return;
         const delta = e.pageY - lastPageY;
         if (lastPageY < e.pageY) {
