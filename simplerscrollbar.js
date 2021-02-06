@@ -140,25 +140,18 @@
         right: ${(that.target.clientWidth - that.bar.clientWidth + rightOffset) * -1}px;`;
       });
     }
-    getOffsetFromEvent(e) {
-      let op = e.target.parentElement;
-      if (!op || !op.offsetTop) return null;
-      while (op.offsetTop < 1) {
-        if (op === undefined) return null;
-        op = op.parentElement;
-      }
-      if (op.offsetTop === undefined) return null;
-      return op.offsetTop;
-    }
     // Mouse drag handler
     dragDealer() {
       let lastPageY;
       let mousePosOnBar;
-      let offset;
       const that = this;
+      const scroll = function(delta) {
+        raf(() => {
+          that.content.scrollTop += delta / that.scrollRatio;
+        });
+      };
       that.bar.addEventListener('mousedown', e => {
         that.bar.classList.add('ss-grabbed');
-        offset = that.getOffsetFromEvent(e);
         lastPageY = e.pageY;
         mousePosOnBar = e.clientY - e.target.offsetTop;
         d.body.classList.add('ss-grabbed');
@@ -170,21 +163,12 @@
       }, that.eventArgs);
 
       function drag(e) {
-        if (offset === null) return;
         const delta = e.pageY - lastPageY;
-        if (lastPageY < e.pageY) {
-          if ((mousePosOnBar + offset) <= e.clientY) {
-            raf(() => {
-              that.content.scrollTop += delta / that.scrollRatio;
-            });
-          }
+        if (lastPageY <= e.pageY) {
+          if (mousePosOnBar <= e.clientY) scroll(delta);
         }
-        else if ((offset + that.target.clientHeight -
-          (that.bar.clientHeight - mousePosOnBar)) >= e.clientY) {
-          raf(() => {
-            that.content.scrollTop += delta / that.scrollRatio;
-          });
-        }
+        else if ((that.target.clientHeight -
+          (that.bar.clientHeight - mousePosOnBar)) >= e.clientY) scroll(delta);
         lastPageY = e.pageY;
       }
       function stop() {
