@@ -27,10 +27,10 @@ properties are named arguments described below:
 
 ```Javascript
 const argObj = {
-  container: Element // reqired
-  wrapper: Element // optional
-  content: Element // optional
-  rightOffset: 0 // optional
+  container: Element, // reqired
+  wrapper: Element, // optional
+  content: Element, // optional
+  rightOffset: 0, // optional
   // You can offset position of the bar from the right edge of div by changing the value above.
 }
 ```
